@@ -14,3 +14,10 @@ enum ParticipantStatus {
   participant
   winner 
 }
+
+enum AgreementStatus {
+  
+  pending   // Teklif beklemede
+  accepted  // Teklif kabul edildi
+  rejected  // Teklif reddedildi
+}

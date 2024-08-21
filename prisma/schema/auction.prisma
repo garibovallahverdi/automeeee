@@ -3,6 +3,7 @@
 model Auction {
   id             String   @id @default(uuid())
   slug           String   @unique
+  adminAccept    Boolean      @default(false)
   lotName        String
   ownerId        String
   owner          User     @relation("UserLots", fields: [ownerId], references: [id], onDelete: Cascade)
@@ -12,10 +13,9 @@ model Auction {
   carDetailId    String?
   ownerName      String
   location       String
-  startPrice     Int
+  startPrice     Int 
   interval       Int?
   image          String[]
-  startTime      DateTime
   status         LotStatus @default(scheduled)
   detailsText    String
   lotNumber      Int

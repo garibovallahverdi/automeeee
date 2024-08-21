@@ -1,5 +1,5 @@
 import prisma from "../config/db";
-import { scheduleBidJob } from "../utils/queues";
+// import { scheduleBidJob } from "../utils/queues";
 
 export class BidService {
 
@@ -74,7 +74,7 @@ export class BidService {
       where: { id: auctionId },
       data: { bidCounts: { increment: 1 } },
     });
-    await scheduleBidJob(auctionId);
+    // await scheduleBidJob(auctionId);
 
     return bid;
   }

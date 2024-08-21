@@ -4,15 +4,17 @@ import prisma from '../config/db';
 
 class AuthSerivice {
   // Kullanıcı kaydı ve doğrulama kodu gönderme
-    async registerUser(email: string, password: string, firstName: string,lastName:string) {
-      
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-      // Doğrulama kodu süresini belirle (2 dakika)
-      const verificationCodeExpiresAt = new Date(Date.now() + 2 * 60 * 1000);
-
-      const user = await prisma.user.create({
+  async registerUser(email: string, password: string, firstName: string, lastName: string) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+  
+    // Doğrulama kodu süresini belirle (2 dakika)
+    const verificationCodeExpiresAt = new Date(Date.now() + 2 * 60 * 1000);
+  
+    let user = await prisma.user.findUnique({ where: { email } });
+  
+    if (!user) {
+      user = await prisma.user.create({
         data: {
           email,
           password: hashedPassword,
@@ -20,14 +22,29 @@ class AuthSerivice {
           lastName,
           verificationCode,
           verificationCodeExpiresAt,
-          isEmailVerified:false
+          isEmailVerified: false
         },
       });
-
-      await sendVerificationCodeEmail(email, verificationCode);
-
-      return user;
+    } else {
+      if (user.isEmailVerified) {
+        return { message: "Email already verified", status: 400 };
+      }
+  
+      // Kullanıcı varsa, verification code ve expiresAt güncelle
+      user = await prisma.user.update({
+        where: { email },
+        data: {
+          verificationCode,
+          verificationCodeExpiresAt
+        }
+      });
     }
+  
+    await sendVerificationCodeEmail(email, verificationCode);
+  
+    return user;
+  }
+  
 
     // Doğrulama kodunu kontrol et
     async verifyUser(email: string, verificationCode: string) {

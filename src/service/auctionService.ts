@@ -1,6 +1,6 @@
 import prisma from "../config/db";
 import { DateTime } from 'luxon';
-import {  scheduleAuctionJobs } from "../utils/queues";
+// import {  scheduleAuctionJobs } from "../utils/queues";
 
 type CarDetailFilter = {
 	manufacturer: string;
@@ -36,13 +36,11 @@ class AuctionService {
 	// Auction ve CarDetail oluşturma ve ilişkilendirme
 	async createAuctionWithCarDetails(data: {
 		lotName: string;
-		ownerId: string;
+		ownerId: string; 
 		ownerName: string;
 		location: string;
 		startPrice: number;
 		interval?: number;
-		image: string[];
-		startTime: string; 
 		status: "scheduled" | "active" | "completed";
 		detailsText: string;
 		carDetail: {
@@ -50,6 +48,7 @@ class AuctionService {
 		  brand: string;
 		  model: string;
 		  year: string;
+		  vinCode:string;
 		  vehicleType: string;
 		  color: string;
 		  mileage: string;
@@ -60,6 +59,10 @@ class AuctionService {
 		  transmission: string;
 		  fuelType: string;
 		  brakeSystem: string;
+		  frontImage : string[];
+		  backImage : string[];
+		  insideImage : string[];
+		  othersImage : string[];
 		};
 	  }) {
 		const {
@@ -69,34 +72,13 @@ class AuctionService {
 		  location,
 		  startPrice,
 		  interval,
-		  image,
-		  startTime,
 		  status,
 		  detailsText,
 		  carDetail,
 		} = data;
-		const isoDateString = startTime;
-		const targetTimeZone = "Asia/Baku"; // 
-		const utcDate = DateTime.fromISO(isoDateString, { zone: targetTimeZone }).toUTC();
-
-
-		const startTimeDate = utcDate.toJSDate()
 	  
-		// Validate if startTimeDate is valid
-		if (isNaN(startTimeDate.getTime())) {
-			console.log(startTimeDate);
-			
-		  throw new Error("Invalid start time date format.");
-		}
-	  
-		const currentTime = new Date();
 	    
-		console.log(currentTime,"current");
-		console.log(startTimeDate,"start");
 		
-		if (startTimeDate < currentTime) {
-		  throw new Error("The start time must be in the future.");
-		}
 	  
 		const lotNumber = await this.getNextLotNumber();
 		const slug = `${lotName.toLowerCase().replace(/\s+/g, "-")}-${lotNumber}`;
@@ -109,8 +91,6 @@ class AuctionService {
 			location,
 			startPrice,
 			interval: interval || 0,
-			image,
-			startTime: startTimeDate,
 			status,
 			detailsText,
 			lotNumber,
@@ -121,6 +101,7 @@ class AuctionService {
 				brand: carDetail.brand,
 				model: carDetail.model,
 				year: carDetail.year,
+				vinCode:carDetail.vinCode,
 				vehicleType: carDetail.vehicleType,
 				color: carDetail.color,
 				mileage: carDetail.mileage,
@@ -131,13 +112,17 @@ class AuctionService {
 				transmission: carDetail.transmission,
 				fuelType: carDetail.fuelType,
 				brakeSystem: carDetail.brakeSystem,
+				frontImage : carDetail.frontImage,
+		  		backImage : carDetail.backImage,
+		  		insideImage : carDetail.insideImage,
+		  		othersImage : carDetail.othersImage
 			  },
 			},
 		  },
 		});
 
 	
-	      await scheduleAuctionJobs(createdAuction);
+	    //   await scheduleAuctionJobs(createdAuction);
 
 		return createdAuction;
 	  }

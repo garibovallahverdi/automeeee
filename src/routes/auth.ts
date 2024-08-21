@@ -25,7 +25,7 @@ router.get(
 router.get('/google/callback', 
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
-    res.redirect(`${process.env.BACK_URL}`+"/me");
+    res.redirect(`${process.env.BACK_URL}`+"/auth/me");
     // res.status(200).json("Done")
   }
 )

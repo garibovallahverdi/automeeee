@@ -13,7 +13,12 @@ model CarDetail {
   engine         String
   transmission   String
   fuelType       String
+  vinCode        String
   brakeSystem    String
+  frontImage     String[]
+  backImage      String[]
+  insideImage    String[]
+  othersImage    String[]
   auction        Auction  @relation("AuctionCarDetail", fields: [auctionId], references: [id], onDelete:Cascade)
   auctionId      String  @unique 
 

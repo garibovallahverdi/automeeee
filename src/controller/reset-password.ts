@@ -3,8 +3,8 @@ import prisma from '../config/db';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { sendResetPasswordEmail } from '../config/nodmailer';
+import jwt from 'jsonwebtoken'
 
-// Şifre sıfırlama isteği
 export const resetPasswordRequest = async (req: Request, res: Response, next: NextFunction) => {
     const { email } = req.body;
 
@@ -15,11 +15,9 @@ export const resetPasswordRequest = async (req: Request, res: Response, next: Ne
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // 6 haneli güvenli kod oluşturma
         const resetPasswordCode = crypto.randomInt(100000, 999999).toString();
-        const resetPassCodeExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 dakika geçerlilik süresi
+        const resetPassCodeExpiresAt = new Date(Date.now() + 10 * 60 * 1000); 
 
-        // Kodun hash'lenerek saklanması
         const hashedCode = await bcrypt.hash(resetPasswordCode, 10);
 
         await prisma.user.update({
@@ -42,7 +40,6 @@ export const resetPasswordRequest = async (req: Request, res: Response, next: Ne
     }
 }
 
-// Şifre sıfırlama kodu kontrolü
 export const verifyResetCode = async (req: Request, res: Response, next: NextFunction) => {
     const { email, resetCode } = req.body;
 
@@ -55,29 +52,31 @@ export const verifyResetCode = async (req: Request, res: Response, next: NextFun
         if (!user.resetPassswordCode) {
             return res.status(400).json({ message: 'Invalid reset code' });
         }
-        // Süresi dolmuş mu kontrolü
         if (!user.resetPassCodeExpiresAt || user.resetPassCodeExpiresAt < new Date()) {
             return res.status(400).json({ message: 'Reset code has expired' });
         }
 
-        // Kodun doğrulanması
         const isCodeValid = await bcrypt.compare(resetCode, user.resetPassswordCode);
         if (!isCodeValid) {
             return res.status(400).json({ message: 'Invalid reset code' });
         }
 
-        res.status(200).json({ message: 'Reset code verified successfully' });
+        const resetToken = jwt.sign({ email }, process.env.JWT_SECRET!, { expiresIn: '5m' });
+
+        res.status(200).json({ message: 'Reset code verified successfully', resetToken });
     } catch (error) {
         next(error);
     }
 }
 
-// Şifre sıfırlama
 export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
-    const { email, newPassword } = req.body;
+    const { newPassword } = req.body;
+    const {token} =req.params
 
     try {
-        const user = await prisma.user.findUnique({ where: { email } });
+        const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
+
+        const user = await prisma.user.findUnique({ where: { email: decoded.email } });
 
         if (!user || !user.resetPassCodeExpiresAt || !user.resetPassswordCode) {
             return res.status(404).json({ message: 'User not found' });
@@ -86,16 +85,19 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
         await prisma.user.update({
-            where: { email },
+            where: { email: decoded.email },
             data: {
                 password: hashedPassword,
-                resetPassswordCode: null, // Kodun temizlenmesi
+                resetPassswordCode: null, 
                 resetPassCodeExpiresAt: null,
             },
         });
 
         res.status(200).json({ message: 'Password reset successful' });
-    } catch (error) {
+    } catch (error:any) {
+        if (error.name === 'TokenExpiredError') {
+            return res.status(400).json({ message: 'Reset token has expired' });
+        }
         next(error);
     }
 }

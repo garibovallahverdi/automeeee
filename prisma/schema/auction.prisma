@@ -15,8 +15,8 @@ model Auction {
   location       String
   startPrice     Int 
   interval       Int?
-  image          String[]
   status         LotStatus @default(scheduled)
+  rejectionReason String?
   detailsText    String
   lotNumber      Int
   bidCounts      Int      @default(0)
@@ -30,5 +30,6 @@ enum LotStatus {
   scheduled 
   active
   completed
+  reject
 }
 

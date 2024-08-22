@@ -60,7 +60,6 @@ class UserService {
   async updateUserInfo(data: UpdateUserData) {
     const { id, firstName, lastName, email, location } = data;
 
-    // Kullanıcıyı güncelle
     const updatedUser = await prisma.user.update({
       where: { id },
       data: {
@@ -77,7 +76,6 @@ class UserService {
 
    async  getWinnerAuctionsByUserId(userId: string) {
     try {
-      // Kullanıcının kazandığı açık artırmaları bul
       const winnerAuctions = await prisma.participant.findMany({
         where: {
           userId: userId,

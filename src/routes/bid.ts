@@ -6,7 +6,6 @@ const router = Router();
 const bidController = new BidController()
 
 
-// Teklif verme
 router.post('/place-bid', ensureAuthenticated, (req, res, next) => bidController.placeBid(req, res, next));
 
 export default router;

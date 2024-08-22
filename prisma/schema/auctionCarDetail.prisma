@@ -15,6 +15,7 @@ model CarDetail {
   fuelType       String
   vinCode        String
   brakeSystem    String
+  insurancePolicy String?
   frontImage     String[]
   backImage      String[]
   insideImage    String[]

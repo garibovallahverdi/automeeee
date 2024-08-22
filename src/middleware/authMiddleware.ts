@@ -10,7 +10,7 @@ export function ensureAuthenticated(req: Request, res: Response, next: NextFunct
 }
 
 export function ensureAdmin(req: Request, res: Response, next: NextFunction) {
-  if (req.isAuthenticated() && (req.user as any).role === 'admin') {
+  if (req.isAuthenticated() && (req.user as any).role === 'ADMIN') {
     return next();
   }
   res.status(403).json({ message: 'Forbidden' });

@@ -3,12 +3,10 @@ import { sendVerificationCodeEmail } from '../config/nodmailer';
 import prisma from '../config/db';
 
 class AuthSerivice {
-  // Kullanıcı kaydı ve doğrulama kodu gönderme
   async registerUser(email: string, password: string, firstName: string, lastName: string) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
   
-    // Doğrulama kodu süresini belirle (2 dakika)
     const verificationCodeExpiresAt = new Date(Date.now() + 2 * 60 * 1000);
   
     let user = await prisma.user.findUnique({ where: { email } });
@@ -30,7 +28,6 @@ class AuthSerivice {
         return { message: "Email already verified", status: 400 };
       }
   
-      // Kullanıcı varsa, verification code ve expiresAt güncelle
       user = await prisma.user.update({
         where: { email },
         data: {
@@ -46,7 +43,6 @@ class AuthSerivice {
   }
   
 
-    // Doğrulama kodunu kontrol et
     async verifyUser(email: string, verificationCode: string) {
       const user = await prisma.user.findUnique({
         where: { email },
@@ -72,7 +68,6 @@ class AuthSerivice {
       return { message: 'Hesap doğrulandı' };
     }
 
-  // Doğrulama kodunu yeniden gönder
   async resendVerificationCode(email: string) {
     const user = await prisma.user.findUnique({
       where: { email },

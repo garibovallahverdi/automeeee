@@ -13,8 +13,8 @@ import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
 import { ensureAuthenticated } from './middleware/authMiddleware';
-import http from 'http';  // Import http for Socket.IO
-import { Server as SocketIOServer } from 'socket.io'; // Import Socket.IO server
+import http from 'http';  
+import { Server as SocketIOServer } from 'socket.io'; 
 
 dotenv.config();
 
@@ -77,7 +77,6 @@ if (cluster.isPrimary) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Add CSRF protection middleware
 
   app.get('/',(req, res) => {
     res.send("Hellooooo")
@@ -98,6 +97,7 @@ if (cluster.isPrimary) {
   app.use('/reset-settings', require('./routes/reset-password').default);
   app.use('/auction', require('./routes/auction').default);
   app.use('/bid', require('./routes/bid').default);
+  app.use('/admin', require('./admin/routes/admin').default);
 
   app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(err.stack); 
@@ -107,18 +107,15 @@ if (cluster.isPrimary) {
   const server = http.createServer(app);
   const io = new SocketIOServer(server);
 
-  // Handle socket connections
   io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
-    // Join a room based on auction ID
     socket.on('join_auction', (auctionId) => {
       const room = `auction-${auctionId}`;
       socket.join(room);
       console.log(`User ${socket.id} joined room ${room}`);
     });
 
-    // Handle bids
     socket.on('new_bid', (data) => {
       const room = `auction-${data.auctionId}`;
       io.to(room).emit('bid_update', data);

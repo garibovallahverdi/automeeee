@@ -18,6 +18,17 @@ class AuctionController {
 		}
 	}
 
+	async updateAuction(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { auctionId } = req.params;
+			const user = req.user; 
+			const updatedAuction = await this.auctionService.updateAuctionWithCarDetails(auctionId, req.body, user);
+			res.status(200).json(updatedAuction);
+		} catch (error) {
+			next(error);
+		}
+	}
+	
 	async addBidder(req: Request, res: Response, next: NextFunction) {
 		try {
 			const { userId, auctionId } = req.body;

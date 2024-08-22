@@ -53,10 +53,6 @@ class UserController {
       const { firstName,lastName, email, location } = req.body;
       const {userId} =req.params
 
-      // Kullanıcı ID'si session'dan alınır
-      // const userId = req.user?.id;
-
-      // Kullanıcı verilerini güncelle
       const updatedUser = await this.userService.updateUserInfo({ id: userId, firstName, lastName, email, location });
 
       res.status(200).json(updatedUser);
@@ -67,7 +63,7 @@ class UserController {
   
 
   async getWinnerAuctions(req: Request, res: Response, next: NextFunction) {
-    const userId = req.params.userId; // Kullanıcı ID'si URL parametresinden alınır
+    const userId = req.params.userId; 
   
     try {
       const winnerAuctions = await this.userService.getWinnerAuctionsByUserId(userId);

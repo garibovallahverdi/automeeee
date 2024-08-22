@@ -5,7 +5,7 @@ const router = express.Router()
 
 router.post('/request-password-reset',resetPasswordRequest)
 router.get('/check-reset-password-token',verifyResetCode)
-router.post('/reset-password/',resetPassword)
+router.post('/reset-password/:token',resetPassword)
 
 
 export default router

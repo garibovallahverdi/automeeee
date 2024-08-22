@@ -9,7 +9,6 @@ class AuthController {
     this.authService = new AuthSerivice();
   }
 
-  // Kayıt işlemi
   async register(req: Request, res: Response,next :NextFunction) {
     try {
       const { email, password, firstName ,lastName} = req.body;

@@ -16,9 +16,9 @@ model CarDetail {
   vinCode        String
   brakeSystem    String
   insurancePolicy String?
-  frontImage     String[]
-  backImage      String[]
-  insideImage    String[]
+  frontImage     String
+  backImage      String
+  insideImage    String
   othersImage    String[]
   auction        Auction  @relation("AuctionCarDetail", fields: [auctionId], references: [id], onDelete:Cascade)
   auctionId      String  @unique 

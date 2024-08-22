@@ -90,7 +90,7 @@ class AuthSerivice {
 
     await sendVerificationCodeEmail(email, newVerificationCode);
 
-    return { message: 'Yeni doğrulama kodu gönderildi' };
+    return { message: 'Yeni doğrulama kodu gönderildi',verificationCodeExpiresAt };
   }
 
 

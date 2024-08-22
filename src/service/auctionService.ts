@@ -183,6 +183,7 @@ class AuctionService {
 				startPrice: data.startPrice || auction.startPrice,
 				interval: data.interval !== undefined ? data.interval : auction.interval,
 				status: "scheduled",
+				rejectionReason:null,
 				detailsText: data.detailsText || auction.detailsText,
 				carDetail: {
 					update: {

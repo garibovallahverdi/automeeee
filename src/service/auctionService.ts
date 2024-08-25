@@ -44,7 +44,7 @@ class AuctionService {
 		detailsText: string;
 		carDetail: {
 		  manufacturer: string;
-		  brand: string;
+		  brand: string; 
 		  model: string;
 		  year: string;
 		  vinCode:string;
@@ -59,9 +59,9 @@ class AuctionService {
 		  fuelType: string;
 		  insurancePolicy:string
 		  brakeSystem: string;
-		  frontImage : string[];
-		  backImage : string[];
-		  insideImage : string[];
+		  frontImage : string;
+		  backImage : string;
+		  insideImage : string;
 		  othersImage : string[];
 		};
 	  }) {
@@ -154,9 +154,9 @@ class AuctionService {
 				fuelType?: string;
 				insurancePolicy?: string;
 				brakeSystem?: string;
-				frontImage?: string[];
-				backImage?: string[];
-				insideImage?: string[];
+				frontImage?: string;
+				backImage?: string;
+				insideImage?: string;
 				othersImage?: string[];
 			};
 		}, 

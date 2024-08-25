@@ -25,8 +25,7 @@ router.get(
 router.get('/google/callback', 
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
-    res.redirect(`${process.env.BACK_URL}`+"/auth/me");
-    // res.status(200).json("Done")
+    res.redirect(`${process.env.FRONT_URL}`+"/auth/me");
   }
 )
 
@@ -37,9 +36,6 @@ router.get('/check-session', async (req: Request, res: Response) => {
   if (req.isAuthenticated()) {
     res.json({ isAuthenticated: true, user: req.user });
   } else {
-    // If session is expired or invalid, clear any session-related cookies
-    res.clearCookie('remember_me');
-    res.clearCookie('sssid'); // Assuming 'sssid' is the session cookie name
     res.json({ isAuthenticated: false });
   }
 });

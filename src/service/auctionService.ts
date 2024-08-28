@@ -1,3 +1,4 @@
+import { LotStatus } from "@prisma/client";
 import prisma from "../config/db";
 import { DateTime } from 'luxon';
 // import {  scheduleAuctionJobs } from "../utils/queues";
@@ -35,7 +36,6 @@ class AuctionService {
 
 	async createAuctionWithCarDetails(data: {
 		lotName: string;
-		ownerId: string; 
 		ownerName: string;
 		location: string;
 		startPrice: number;
@@ -64,10 +64,9 @@ class AuctionService {
 		  insideImage : string;
 		  othersImage : string[];
 		};
-	  }) {
+	  },user : any) {
 		const {
 		  lotName,
-		  ownerId,
 		  ownerName,
 		  location,
 		  startPrice,
@@ -86,7 +85,7 @@ class AuctionService {
 		const createdAuction = await prisma.auction.create({
 		  data: {
 			lotName,
-			ownerId,
+			ownerId:user.id,
 			ownerName,
 			location,
 			startPrice,
@@ -266,56 +265,51 @@ class AuctionService {
 		return participant;
 	}
 
-	async getAuctions(filter: CarDetailFilter) {
-		const { manufacturer, model, minMileage, maxMileage, minYear, maxYear, color, page, limit } = filter;
-		const take = +limit;
-		const skip = (+page * +limit) - (+limit);
-
-		return await prisma.auction.findMany({
+	async getAuctions(filters: any) {
+		try {
+		  const auctions = await prisma.auction.findMany({
 			where: {
-				carDetail: {
-					manufacturer: {
-						mode: 'insensitive',
-						equals: manufacturer
-					},
-					model: {
-						mode: 'insensitive',
-						equals: model
-					},
-					mileage: {
-						gt: minMileage,
-						lt: maxMileage,
-					},
-					year: {
-						gt: minYear,
-						lt: maxYear,
-					},
-					color,
-				},
+			  lotName: filters.lotName ? filters.lotName : undefined,
+			  location: filters.location ? filters.location : undefined,
+			  status: filters.status ? (filters.status as LotStatus) : undefined,
+			  carDetail: filters.carDetail
+				? {
+					manufacturer: filters.carDetail.manufacturer ? filters.carDetail.manufacturer : undefined,
+					brand: filters.carDetail.brand ? filters.carDetail.brand : undefined,
+					model: filters.carDetail.model ? filters.carDetail.model : undefined,
+					year: filters.carDetail.year ? filters.carDetail.year : undefined,
+				  }
+				: undefined,
 			},
-			orderBy: {
-				createdAt: 'desc'
+			include: {
+			  carDetail: true, // İlgili CarDetail'i dahil eder
 			},
-			skip: skip,
-			take: take
-		});
-	}
-
-	async getAuctionById(id: string) {
-		const auction = await prisma.auction.findUnique({
-		  where: {
-			id,
-		  },
-		  include: {
-			carDetail: true,
-		  },
-		});
-	  
-		if (!auction) {
-		  throw new Error(`Auction with ID ${id} not found`);
+		  });
+	
+		  return auctions;
+		} catch (error) {
+		  throw new Error('Auctionları getirirken bir hata oluştu.');
 		}
-	  
-		return auction;
+	  }
+	
+	  // Belirli bir Auction'ı slug'a göre getirir
+	  async getAuctionBySlug(slug: string) {
+		try {
+		  const auction = await prisma.auction.findUnique({
+			where: { slug },
+			include: {
+			  carDetail: true,
+			},
+		  });
+	
+		  if (!auction) {
+			throw new Error('Auction bulunamadı.');
+		  }
+	
+		  return auction;
+		} catch (error) {
+		  throw new Error('Auctionı getirirken bir hata oluştu.');
+		}
 	  }
 
 	  

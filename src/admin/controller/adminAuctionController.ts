@@ -46,7 +46,23 @@ export const getAllWaitingAuctions = async (req: Request, res: Response, next: N
     }
   };
 
+export const getAuctionByIdAdmin = async  (req: Request, res: Response, next: NextFunction) => {
+   const {id} =req.params
 
+   try {
+    const auction = await prisma.auction.findUnique({
+      where: { id },
+      include: {
+			  carDetail: true,
+			},  
+  });
+    
+  res.status(200).json(auction)
+
+   } catch (error) {
+     next(error)
+   }
+}
 
 
   export const updateAuctionStatus = async (req: Request, res: Response, next: NextFunction) => {
@@ -79,6 +95,7 @@ export const getAllWaitingAuctions = async (req: Request, res: Response, next: N
                     adminAccept: true,
                     status: 'active',
                     rejectionReason: null,
+                    updatedAt:new Date()
                 },
             });
 

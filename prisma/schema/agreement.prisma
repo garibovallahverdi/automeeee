@@ -1,0 +1,25 @@
+enum AgreementStatus {
+  pending   // Anlaşma beklemede
+  sold      // Anlaşma tamamlandı ve satış gerçekleşti
+  canceled  // Anlaşma iptal edildi
+}
+
+model Agreement {
+  id              String          @id @default(uuid())
+  auctionId       String          @unique
+  buyerId         String          
+  sellerId        String          
+  bidId           String          @unique       
+  status          AgreementStatus @default(pending) // Anlaşma durumu
+  buyerConfirmed  Boolean         @default(false)  // Alıcı tarafından onaylandı mı?
+  sellerConfirmed Boolean         @default(false)  // Satıcı tarafından onaylandı mı?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  auction         Auction         @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  buyer           User            @relation("BuyerAgreements", fields: [buyerId], references: [id])
+  seller          User            @relation("SellerAgreements", fields: [sellerId], references: [id])
+  bid             Bid             @relation(fields: [bidId], references: [id])
+
+  @@unique([auctionId, buyerId, sellerId, bidId])  // Her dörtü de benzersiz olacak
+}

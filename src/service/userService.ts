@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import prisma from '../config/db';
+import { LotStatus, ParticipantStatus } from '@prisma/client';
 
 
 interface UpdateUserData {
@@ -11,28 +12,47 @@ interface UpdateUserData {
 }
 
 class UserService {
-    async getParticipatedAuctions(userId: string) {
-        const participations  = await prisma.participant.findMany({
-          where: { userId },
+    
+
+  async getUserOwnAuctions(userId: string, status?: string) {
+    const whereCondition: any = { ownerId: userId };
+
+    if (status) {
+        whereCondition.status = status as LotStatus; 
+    }
+
+    const auctions = await prisma.auction.findMany({
+        where: whereCondition,
+        include: {
+            owner: true,
+        },
+    });
+
+    return auctions;
+}
+      async getUserParticipants(userId: string, status?: string) {
+        let statusFilter: ParticipantStatus[] | undefined;
+    
+        if (status) {
+          if (status === 'both') {
+            statusFilter = [ParticipantStatus.participant, ParticipantStatus.winner];
+          } else {
+            statusFilter = [status as ParticipantStatus];
+          }
+        }
+    
+        const participations = await prisma.participant.findMany({
+          where: { 
+            userId,
+            status: statusFilter ? { in: statusFilter } : undefined, // Birden fazla status filtresi için "in" kullanılıyor
+          },
           include: {
-            auctions: true, 
+            auctions: true, // İlgili auctionları da dahil eder
           },
         });
     
-        return participations.map((participation:any) => participation.auctions);
+        return participations;
       }
-
-      async getUserOwnAuctions(userId: string) {
-        const participations  = await prisma.auction.findMany({
-          where: { ownerId:userId },
-          include: {
-            owner: true, 
-          },
-        });
-    
-        return participations.map((participation:any) => participation.auctions);
-      }
-
 
 
   async changePassword(userId: string, oldPassword: string, newPassword: string) {
@@ -74,24 +94,7 @@ class UserService {
   }
 
 
-   async  getWinnerAuctionsByUserId(userId: string) {
-    try {
-      const winnerAuctions = await prisma.participant.findMany({
-        where: {
-          userId: userId,
-          status: 'winner', 
-        },
-        include: {
-          auctions: true, 
-        },
-      });
-  
-      return winnerAuctions.map(participant => participant.auctions);
-    } catch (error) {
-      console.error('Error fetching winner auctions:', error);
-      throw new Error('Could not fetch winner auctions');
-    }
-  }
+ 
 }
 
 export default UserService;

@@ -13,6 +13,7 @@ import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
 import { ensureAuthenticated } from './middleware/authMiddleware';
+import bodyParser from 'body-parser';
 import http from 'http';  
 import { Server as SocketIOServer } from 'socket.io'; 
 
@@ -48,7 +49,8 @@ if (cluster.isPrimary) {
 
   app.use(helmet());
   app.use(cookieParser());
-  app.use(express.json());
+  app.use(bodyParser.json({ limit: '10mb' }));  // 10MB sınırı
+  app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -78,8 +80,11 @@ if (cluster.isPrimary) {
   app.use(passport.session());
 
 
-  app.get('/',(req, res) => {
-    res.send("Hellooooo")
+  app.get('/', ensureAuthenticated,(req, res) => {
+    const user= req.user as any
+    console.log( user.id);
+    
+    res.send(user)
   });
 
   app.get('/fast', (req, res) => {

@@ -10,8 +10,10 @@ class AuctionController {
 	}
 
 	async createAuction(req: Request, res: Response, next: NextFunction) {
+		const user = req.user as any
+        		
 		try {
-			const auction = await this.auctionService.createAuctionWithCarDetails(req.body);
+			const auction = await this.auctionService.createAuctionWithCarDetails(req.body,user);
 			res.status(201).json(auction);
 		} catch (error) {
 			next(error);
@@ -41,39 +43,26 @@ class AuctionController {
 		}
 	}
 
-	async listAuctions(req: Request, res: Response, next: NextFunction) {
-		const { manufacturer, model, minMileage, maxMileage, maxYear, minYear, color, page, limit } = req.query as CarDetailFilter;
-
+	async getAuctions(req: Request, res: Response,next:NextFunction) {
 		try {
-			const auctions = await this.auctionService.getAuctions({
-				manufacturer,
-				model,
-				minMileage,
-				maxMileage,
-				minYear,
-				maxYear,
-				color,
-				page,
-				limit
-			});
-
-			res.status(200).send(auctions);
-		} catch (error) {
-			next(error);
-		}
-	}
-
-
-
-
+		  const filters = req.query; // Query parametrelerinden filtreleri alır
+		  const auctions = await this.auctionService.getAuctions(filters);
 	
-	async getAuction(req: Request, res: Response, next: NextFunction) {
+		  res.status(200).json(auctions);
+		} catch (error) {
+		  res.status(500).json({ message: error });
+		}
+	  }
+	
+	  // Slug'a göre belirli bir Auction'ı getirir
+	  async getAuctionBySlug(req: Request, res: Response,next:NextFunction) {
 		try {
-		  const id = req.params.id;
-		  const auction = await this.auctionService.getAuctionById(id);
+		  const { slug } = req.params;
+		  const auction = await this.auctionService.getAuctionBySlug(slug);
+	
 		  res.status(200).json(auction);
 		} catch (error) {
-		  next(error);
+		  res.status(500).json({ message: error });
 		}
 	  }
 	

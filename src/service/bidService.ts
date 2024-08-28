@@ -68,7 +68,11 @@ export class BidService {
       where: { id: auctionId },
       data: { bidCounts: { increment: 1 } },
     });
-    await scheduleBidJob(auctionId);
+
+    const auction  = await prisma.auction.findUnique({
+      where: { id: auctionId },
+    })
+    await scheduleBidJob(auction, bid,userId);
 
     return bid;
   }

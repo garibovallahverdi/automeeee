@@ -6,5 +6,7 @@ model Bid {
   userId    String
   auction   Auction  @relation("AuctionOffers", fields: [auctionId], references: [id],onDelete: Cascade)
   auctionId String
+  agreement    Agreement?   
+
     
 }

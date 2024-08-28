@@ -7,23 +7,26 @@ class UserController {
   constructor() {
     this.userService = new UserService();
   }
-  async getParticipatedAuctions(req: Request, res: Response,next:NextFunction) {
+  async getUserOwnAuctions(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.params.userId;
+        const userId = req.params.userId;
+        const status = req.query.status as string; 
 
-      const auctions = await this.userService.getParticipatedAuctions(userId);
+        const auctions = await this.userService.getUserOwnAuctions(userId, status);
 
-      res.status(200).json(auctions);
+        res.status(200).json(auctions);
     } catch (error) {
-        next(error)
+        next(error);
     }
   }
 
-  async getUserOwnAuctions(req: Request, res: Response,next:NextFunction) {
+  async getUserParticipants(req: Request, res: Response,next:NextFunction) {
     try {
       const userId = req.params.userId;
+      const status = req.query.status as string; 
 
-      const auctions = await this.userService.getUserOwnAuctions(userId);
+
+      const auctions = await this.userService.getUserParticipants(userId,status);
 
       res.status(200).json(auctions);
     } catch (error) {
@@ -62,16 +65,7 @@ class UserController {
   }
   
 
-  async getWinnerAuctions(req: Request, res: Response, next: NextFunction) {
-    const userId = req.params.userId; 
-  
-    try {
-      const winnerAuctions = await this.userService.getWinnerAuctionsByUserId(userId);
-      res.status(200).json(winnerAuctions);
-    } catch (error) {
-      next(error);
-    }
-  };
+ 
 
 }
 

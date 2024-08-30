@@ -108,7 +108,7 @@ export const getAuctionByIdAdmin = async  (req: Request, res: Response, next: Ne
                 where: { id },
                 data: {
                     adminAccept: false,
-                    status: 'completed',
+                    status: 'reject',
                     rejectionReason: rejectionReason || 'No reason provided',
                     updatedAt:new Date()
                 },

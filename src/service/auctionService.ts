@@ -4,7 +4,6 @@ import { DateTime } from 'luxon';
 // import {  scheduleAuctionJobs } from "../utils/queues";
 
 type CarDetailFilter = {
-	manufacturer: string;
 	model: string;
 	minMileage: string;
 	maxMileage: string;
@@ -43,7 +42,6 @@ class AuctionService {
 		status: "scheduled" | "active" | "completed" | "reject";
 		detailsText: string;
 		carDetail: {
-		  manufacturer: string;
 		  brand: string; 
 		  model: string;
 		  year: string;
@@ -96,7 +94,6 @@ class AuctionService {
 			slug,
 			carDetail: {
 			  create: {
-				manufacturer: carDetail.manufacturer,
 				brand: carDetail.brand,
 				model: carDetail.model,
 				year: carDetail.year,
@@ -137,7 +134,6 @@ class AuctionService {
 			status?: "scheduled" | "active" | "completed" | "reject";
 			detailsText?: string;
 			carDetail?: {
-				manufacturer?: string;
 				brand?: string;
 				model?: string;
 				year?: string;
@@ -162,7 +158,7 @@ class AuctionService {
 		user: any 
 	) {
 		const auction = await prisma.auction.findUnique({
-			where: { id: auctionId },
+			where: { id: auctionId , status:"reject"},
 			include:{carDetail:true}
 		});
 	
@@ -186,7 +182,6 @@ class AuctionService {
 				detailsText: data.detailsText || auction.detailsText,
 				carDetail: {
 					update: {
-						manufacturer: data.carDetail?.manufacturer || auction.carDetail?.manufacturer,
 						brand: data.carDetail?.brand || auction.carDetail?.brand,
 						model: data.carDetail?.model || auction.carDetail?.model,
 						year: data.carDetail?.year || auction.carDetail?.year,
@@ -274,7 +269,6 @@ class AuctionService {
 			  status: filters.status ? (filters.status as LotStatus) : undefined,
 			  carDetail: filters.carDetail
 				? {
-					manufacturer: filters.carDetail.manufacturer ? filters.carDetail.manufacturer : undefined,
 					brand: filters.carDetail.brand ? filters.carDetail.brand : undefined,
 					model: filters.carDetail.model ? filters.carDetail.model : undefined,
 					year: filters.carDetail.year ? filters.carDetail.year : undefined,
@@ -282,7 +276,7 @@ class AuctionService {
 				: undefined,
 			},
 			include: {
-			  carDetail: true, // İlgili CarDetail'i dahil eder
+			  carDetail: true, 
 			},
 		  });
 	

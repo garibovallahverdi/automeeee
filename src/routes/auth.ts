@@ -25,7 +25,7 @@ router.get(
 router.get('/google/callback', 
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
-    res.redirect(`${process.env.FRONT_URL}`+"/auth/me");
+    res.redirect(`${process.env.FRONT_URL}`+"/");
   }
 )
 
@@ -45,7 +45,7 @@ router.get('/logout', (req: Request, res: Response) => {
     if (err) {
       return res.status(500).json({ message: 'Error logging out', err });
     }
-    res.json({ message: 'Logged out successfully' });
+    res.status(200).json({ message: 'Logged out successfully' });
   });
 });
 

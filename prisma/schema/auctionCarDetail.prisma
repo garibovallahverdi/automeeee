@@ -1,6 +1,5 @@
 model CarDetail {
   id             String @id @default(uuid())
-  manufacturer   String
   brand          String
   model          String
   year           String

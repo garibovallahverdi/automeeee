@@ -17,7 +17,7 @@ class UserService {
   async getUserOwnAuctions(userId: string, status?: string) {
     const whereCondition: any = { ownerId: userId };
 
-    if (status) {
+    if (status && status !== 'all') {
         whereCondition.status = status as LotStatus; 
     }
 
@@ -44,10 +44,10 @@ class UserService {
         const participations = await prisma.participant.findMany({
           where: { 
             userId,
-            status: statusFilter ? { in: statusFilter } : undefined, // Birden fazla status filtresi için "in" kullanılıyor
+            status: statusFilter ? { in: statusFilter } : undefined, 
           },
           include: {
-            auctions: true, // İlgili auctionları da dahil eder
+            auctions: true, 
           },
         });
     

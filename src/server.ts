@@ -49,8 +49,8 @@ if (cluster.isPrimary) {
 
   app.use(helmet());
   app.use(cookieParser());
-  app.use(bodyParser.json({ limit: '10mb' }));  // 10MB sınırı
-  app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+  app.use(bodyParser.json({ limit: '100mb' }));  // 10MB sınırı
+  app.use(bodyParser.urlencoded({ extended: true, limit: '100mb' }));
 
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -61,7 +61,7 @@ if (cluster.isPrimary) {
 
   app.use(
     session({
-      name: "sssid",
+      name: "autome-stack-sssid",
       store: new RedisStore({
         client: redis,
         disableTouch: true

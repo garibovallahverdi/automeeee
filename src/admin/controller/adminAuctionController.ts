@@ -97,6 +97,7 @@ export const getAuctionByIdAdmin = async  (req: Request, res: Response, next: Ne
                     rejectionReason: null,
                     updatedAt:new Date()
                 },
+                include:{carDetail:true}
             });
 
             notificationType = NotificationType.AUCTION_ACCEPTED;
@@ -112,6 +113,8 @@ export const getAuctionByIdAdmin = async  (req: Request, res: Response, next: Ne
                     rejectionReason: rejectionReason || 'No reason provided',
                     updatedAt:new Date()
                 },
+                include:{carDetail:true}
+
             });
 
             notificationType = NotificationType.AUCTION_REJECTED

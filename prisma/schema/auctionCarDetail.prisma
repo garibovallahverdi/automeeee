@@ -14,7 +14,8 @@ model CarDetail {
   fuelType       String
   vinCode        String
   brakeSystem    String
-  insurancePolicy String?
+  insurancePolicy String
+  technicalDocument String
   frontImage     String
   backImage      String
   insideImage    String

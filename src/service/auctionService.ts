@@ -33,36 +33,40 @@ class AuctionService {
 		return expectedLotNumber;
 	}
 
-	async createAuctionWithCarDetails(data: {
-		lotName: string;
-		ownerName: string;
-		location: string;
-		startPrice: number;
-		interval?: number;
-		status: "scheduled" | "active" | "completed" | "reject";
-		detailsText: string;
-		carDetail: {
-		  brand: string; 
-		  model: string;
-		  year: string;
-		  vinCode:string;
-		  vehicleType: string;
-		  color: string;
-		  mileage: string;
-		  engineCapacity: string;
-		  carSegments: string;
-		  driveType: string;
-		  engine: string;
-		  transmission: string;
-		  fuelType: string;
-		  insurancePolicy:string
-		  brakeSystem: string;
-		  frontImage : string;
-		  backImage : string;
-		  insideImage : string;
-		  othersImage : string[];
-		};
-	  },user : any) {
+	async createAuctionWithCarDetails(
+		data: {
+		  lotName: string;
+		  ownerName: string;
+		  location: string;
+		  startPrice: number;
+		  interval?: number;
+		  status: "scheduled" | "active" | "completed" | "reject";
+		  detailsText: string;
+		  carDetail: {
+			brand: string;
+			model: string;
+			year: string;
+			vinCode: string;
+			vehicleType: string;
+			color: string;
+			mileage: string;
+			engineCapacity: string;
+			carSegments: string;
+			driveType: string;
+			engine: string;
+			transmission: string;
+			fuelType: string;
+			insurancePolicy: string;
+			technicalDocument: string;
+			brakeSystem: string;
+			frontImage: string;
+			backImage: string;
+			insideImage: string;
+			othersImage: string[];
+		  };
+		},
+		user: any
+	  ) {
 		const {
 		  lotName,
 		  ownerName,
@@ -74,16 +78,14 @@ class AuctionService {
 		  carDetail,
 		} = data;
 	  
-	    
-		
-	  
 		const lotNumber = await this.getNextLotNumber();
 		const slug = `${lotName.toLowerCase().replace(/\s+/g, "-")}-${lotNumber}`;
 	  
+		// Auction ve CarDetail'i tek bir işlemde oluşturun
 		const createdAuction = await prisma.auction.create({
 		  data: {
 			lotName,
-			ownerId:user.id,
+			ownerId: user.id,
 			ownerName,
 			location,
 			startPrice,
@@ -97,7 +99,7 @@ class AuctionService {
 				brand: carDetail.brand,
 				model: carDetail.model,
 				year: carDetail.year,
-				vinCode:carDetail.vinCode,
+				vinCode: carDetail.vinCode,
 				vehicleType: carDetail.vehicleType,
 				color: carDetail.color,
 				mileage: carDetail.mileage,
@@ -108,21 +110,23 @@ class AuctionService {
 				transmission: carDetail.transmission,
 				fuelType: carDetail.fuelType,
 				brakeSystem: carDetail.brakeSystem,
-				insurancePolicy:carDetail.insurancePolicy || null,
-				frontImage : carDetail.frontImage,
-		  		backImage : carDetail.backImage,
-		  		insideImage : carDetail.insideImage,
-		  		othersImage : carDetail.othersImage
+				insurancePolicy: carDetail.insurancePolicy,
+				technicalDocument: carDetail.technicalDocument,
+				frontImage: carDetail.frontImage,
+				backImage: carDetail.backImage,
+				insideImage: carDetail.insideImage,
+				othersImage: carDetail.othersImage,
 			  },
 			},
 		  },
+		  include: {
+			carDetail: true, // carDetail'in geri dönmesini sağlar
+		  },
 		});
-
-	
-	    //   await scheduleAuctionJobs(createdAuction);
-
+	  
 		return createdAuction;
 	  }
+	  
 	  
 	  async updateAuctionWithCarDetails(
 		auctionId: string, 
@@ -148,6 +152,7 @@ class AuctionService {
 				transmission?: string;
 				fuelType?: string;
 				insurancePolicy?: string;
+				technicalDocument?: string;
 				brakeSystem?: string;
 				frontImage?: string;
 				backImage?: string;
@@ -196,6 +201,7 @@ class AuctionService {
 						transmission: data.carDetail?.transmission || auction.carDetail?.transmission,
 						fuelType: data.carDetail?.fuelType || auction.carDetail?.fuelType,
 						insurancePolicy: data.carDetail?.insurancePolicy || auction.carDetail?.insurancePolicy,
+						technicalDocument: data.carDetail?.technicalDocument || auction.carDetail?.technicalDocument,
 						brakeSystem: data.carDetail?.brakeSystem || auction.carDetail?.brakeSystem,
 						frontImage: data.carDetail?.frontImage || auction.carDetail?.frontImage,
 						backImage: data.carDetail?.backImage || auction.carDetail?.backImage,

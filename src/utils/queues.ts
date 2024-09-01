@@ -70,8 +70,8 @@ auctionQueue.process('completeAuctionAfterBid', async (job) => {
     const agrement = await prisma.agreement.create({
       data:{
         auctionId:auction.id,
-        sellerId:userId,
-        buyerId:auction.ownerId,
+        sellerId:auction.ownerId,
+        buyerId:userId,
         bidId:bid.id
       }
     })
@@ -146,7 +146,7 @@ export const scheduleBidJob = async (auction: any,bid:any,userId:string) => {
   }
 
   await auctionQueue.add('completeAuctionAfterBid', { auction,bid,userId }, {
-    delay: 24 * 60  * 60 * 1000,
+    delay: 2 * 60 * 1000,
     jobId: `completeAuctionAfterBid-${auction.id}`,
   });
   console.log(`New job scheduled to complete auction ${auction.id} 24 hours after the last bid.`);

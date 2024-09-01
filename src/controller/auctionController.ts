@@ -13,8 +13,11 @@ class AuctionController {
 		const user = req.user as any
         		
 		try {
-			const auction = await this.auctionService.createAuctionWithCarDetails(req.body,user);
-			res.status(201).json(auction);
+			// const auction = await this.auctionService.createAuctionWithCarDetails(req.body,user);
+
+			console.log(req.headers);
+			
+			res.status(201).json(req.body);
 		} catch (error) {
 			next(error);
 		}

@@ -25,6 +25,7 @@ class UserService {
         where: whereCondition,
         include: {
             owner: true,
+            carDetail:true
         },
     });
 

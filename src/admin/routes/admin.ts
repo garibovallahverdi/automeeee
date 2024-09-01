@@ -1,6 +1,6 @@
 import express from "express";
 import { ensureAdmin } from "../../middleware/authMiddleware";
-import { getAllWaitingAuctions, updateAuctionStatus ,getAuctionByIdAdmin} from '../controller/adminAuctionController'
+import { getAllWaitingAuctions, getAuctionByIdAdmin, updateAuctionStatus } from '../controller/adminAuctionController'
 
 const router = express.Router();
 

@@ -120,7 +120,7 @@ class AuctionService {
 			},
 		  },
 		  include: {
-			carDetail: true, // carDetail'in geri dönmesini sağlar
+			carDetail: true, 
 		  },
 		});
 	  
@@ -128,92 +128,92 @@ class AuctionService {
 	  }
 	  
 	  
-	  async updateAuctionWithCarDetails(
-		auctionId: string, 
-		data: {
-			lotName?: string;
-			location?: string;
-			startPrice?: number;
-			interval?: number;
-			status?: "scheduled" | "active" | "completed" | "reject";
-			detailsText?: string;
-			carDetail?: {
-				brand?: string;
-				model?: string;
-				year?: string;
-				vinCode?: string;
-				vehicleType?: string;
-				color?: string;
-				mileage?: string;
-				engineCapacity?: string;
-				carSegments?: string;
-				driveType?: string;
-				engine?: string;
-				transmission?: string;
-				fuelType?: string;
-				insurancePolicy?: string;
-				technicalDocument?: string;
-				brakeSystem?: string;
-				frontImage?: string;
-				backImage?: string;
-				insideImage?: string;
-				othersImage?: string[];
-			};
-		}, 
-		user: any 
-	) {
-		const auction = await prisma.auction.findUnique({
-			where: { id: auctionId , status:"reject"},
-			include:{carDetail:true}
-		});
-	
-		if (!auction) {
-			throw new Error("Auction not found.");
-		}
-	
-		if (auction.ownerId !== user.id) {
-			throw new Error("You are not authorized to update this auction.");
-		}
-	
-		const updatedAuction = await prisma.auction.update({
-			where: { id: auctionId },
-			data: {
-				lotName: data.lotName || auction.lotName,
-				location: data.location || auction.location,
-				startPrice: data.startPrice || auction.startPrice,
-				interval: data.interval !== undefined ? data.interval : auction.interval,
-				status: "scheduled",
-				rejectionReason:null,
-				detailsText: data.detailsText || auction.detailsText,
-				carDetail: {
-					update: {
-						brand: data.carDetail?.brand || auction.carDetail?.brand,
-						model: data.carDetail?.model || auction.carDetail?.model,
-						year: data.carDetail?.year || auction.carDetail?.year,
-						vinCode: data.carDetail?.vinCode || auction.carDetail?.vinCode,
-						vehicleType: data.carDetail?.vehicleType || auction.carDetail?.vehicleType,
-						color: data.carDetail?.color || auction.carDetail?.color,
-						mileage: data.carDetail?.mileage || auction.carDetail?.mileage,
-						engineCapacity: data.carDetail?.engineCapacity || auction.carDetail?.engineCapacity,
-						carSegments: data.carDetail?.carSegments || auction.carDetail?.carSegments,
-						driveType: data.carDetail?.driveType || auction.carDetail?.driveType,
-						engine: data.carDetail?.engine || auction.carDetail?.engine,
-						transmission: data.carDetail?.transmission || auction.carDetail?.transmission,
-						fuelType: data.carDetail?.fuelType || auction.carDetail?.fuelType,
-						insurancePolicy: data.carDetail?.insurancePolicy || auction.carDetail?.insurancePolicy,
-						technicalDocument: data.carDetail?.technicalDocument || auction.carDetail?.technicalDocument,
-						brakeSystem: data.carDetail?.brakeSystem || auction.carDetail?.brakeSystem,
-						frontImage: data.carDetail?.frontImage || auction.carDetail?.frontImage,
-						backImage: data.carDetail?.backImage || auction.carDetail?.backImage,
-						insideImage: data.carDetail?.insideImage || auction.carDetail?.insideImage,
-						othersImage: data.carDetail?.othersImage || auction.carDetail?.othersImage,
-					},
-				},
-			},
-		});
-	
-		return updatedAuction;
+//************************************* */
+async updateAuctionWithCarDetails(
+	auctionId: string,
+	data: {
+	  detailsText?: string;
+	  carDetail?: {
+		brand?: string;
+		model?: string;
+		year?: string;
+		vinCode?: string;
+		vehicleType?: string;
+		color?: string;
+		mileage?: string;
+		engineCapacity?: string;
+		carSegments?: string;
+		driveType?: string;
+		engine?: string;
+		transmission?: string;
+		fuelType?: string;
+		insurancePolicy?: string;
+		technicalDocument?: string;
+		brakeSystem?: string;
+		frontImage?: string;
+		backImage?: string;
+		insideImage?: string;
+		othersImage?: string[];
+	  };
+	},
+	user: any
+  ) {
+	const { detailsText, carDetail } = data;
+  
+	const updatedAuction = await prisma.auction.update({
+	  where: { id: auctionId },
+	  data: {
+		detailsText,
+		carDetail: {
+		  update: {
+			brand: carDetail?.brand,
+			model: carDetail?.model,
+			year: carDetail?.year,
+			vinCode: carDetail?.vinCode,
+			vehicleType: carDetail?.vehicleType,
+			color: carDetail?.color,
+			mileage: carDetail?.mileage,
+			engineCapacity: carDetail?.engineCapacity,
+			carSegments: carDetail?.carSegments,
+			driveType: carDetail?.driveType,
+			engine: carDetail?.engine,
+			transmission: carDetail?.transmission,
+			fuelType: carDetail?.fuelType,
+			brakeSystem: carDetail?.brakeSystem,
+			frontImage: carDetail?.frontImage,
+			backImage: carDetail?.backImage,
+			insideImage: carDetail?.insideImage,
+			othersImage: carDetail?.othersImage,
+			insurancePolicy: carDetail?.insurancePolicy,
+			technicalDocument: carDetail?.technicalDocument,
+		  },
+		},
+	  },
+	  include: {
+		carDetail: true,
+	  },
+	});
+  
+	return updatedAuction;
+  }
+  
+  async getAuctionById(auctionId: string) {
+	const auction = await prisma.auction.findUnique({
+	  where: { id: auctionId },
+	  include: {
+		carDetail: true,
+	  },
+	});
+  
+	if (!auction) {
+	  throw new Error('Auction not found');
 	}
+  
+	return auction;
+  }
+  
+
+//************************************* */
 	
 	
 

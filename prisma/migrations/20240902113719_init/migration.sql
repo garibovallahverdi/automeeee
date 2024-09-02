@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Auction" ALTER COLUMN "startPrice" SET DATA TYPE TEXT,
+ALTER COLUMN "interval" SET DATA TYPE TEXT;

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { AuctionService, CarDetailFilter } from "../service/auctionService";
 import { NextFunction } from "express-serve-static-core";
+import { deleteFileFromS3,deleteOldFiles } from "../utils/awsFileUpload";
 
 class AuctionController {
 	auctionService: AuctionService;
@@ -8,31 +9,167 @@ class AuctionController {
 	constructor() {
 		this.auctionService = new AuctionService();
 	}
-
 	async createAuction(req: Request, res: Response, next: NextFunction) {
-		const user = req.user as any
-        		
+		const user = req.user as any;
+		let uploadedFiles: string[] = [];
+	  
 		try {
-			// const auction = await this.auctionService.createAuctionWithCarDetails(req.body,user);
-
-			console.log(req.headers);
-			
-			res.status(201).json(req.body);
+		  const { frontImage, backImage, insideImage, othersImage, insurancePolicy, technicalDocument } = req.files as {
+			[fieldname: string]: Express.MulterS3.File[];
+		  };
+		    // Yüklenen dosyaların listesini tutuyoruz
+			if (frontImage) uploadedFiles.push(frontImage[0].key);
+			if (backImage) uploadedFiles.push(backImage[0].key);
+			if (insideImage) uploadedFiles.push(insideImage[0].key);
+			if (othersImage) othersImage.forEach(image => uploadedFiles.push(image.key));
+			if (insurancePolicy) uploadedFiles.push(insurancePolicy[0].key);
+			if (technicalDocument) uploadedFiles.push(technicalDocument[0].key);
+	     console.log(frontImage);
+		 
+		  let carDetail;
+		  carDetail = JSON.parse(req.body.carDetail);
+	  
+		
+	  
+		  const data = {
+			lotName: req.body.lotName,
+			ownerName: req.body.ownerName,
+			location: req.body.location,
+			status: req.body.status,
+			detailsText: req.body.detailsText,
+			startPrice: Number(req.body.startPrice),
+			interval: Number(req.body.interval),
+			carDetail: {
+			  ...carDetail,
+			  frontImage: frontImage ? frontImage[0].location : null,
+			  backImage: backImage ? backImage[0].location : null,
+			  insideImage: insideImage ? insideImage[0].location : null,
+			  othersImage: othersImage ? othersImage.map(image => image.location) : [],
+			  insurancePolicy: insurancePolicy ? insurancePolicy[0].location : null,
+			  technicalDocument: technicalDocument ? technicalDocument[0].location : null,
+			}
+		  };
+	  
+		  const auction = await this.auctionService.createAuctionWithCarDetails(data, user);
+	  
+		  console.log(req.files);
+	  
+		  res.status(201).json(auction);
 		} catch (error) {
-			next(error);
-		}
-	}
 
-	async updateAuction(req: Request, res: Response, next: NextFunction) {
-		try {
-			const { auctionId } = req.params;
-			const user = req.user; 
-			const updatedAuction = await this.auctionService.updateAuctionWithCarDetails(auctionId, req.body, user);
-			res.status(200).json(updatedAuction);
-		} catch (error) {
-			next(error);
+		  await Promise.all(
+			uploadedFiles.map(async (key) => {
+			  try {
+				await deleteFileFromS3(key);
+				console.log(`File deleted: ${key}`);
+			  } catch (deleteError) {
+				console.error(`Failed to delete file: ${key}`, deleteError);
+			  }
+			})
+		  );
+		  console.log(uploadedFiles);
+		  
+		  next(error);
 		}
+	  }
+	
+
+//************************************** */
+
+async updateAuction(req: Request, res: Response, next: NextFunction) {
+	const user = req.user as any;
+	const { auctionId } = req.params;
+	let uploadedFiles: string[] = [];
+  
+	try {
+	  const {
+		frontImage,
+		backImage,
+		insideImage,
+		othersImage,
+		insurancePolicy,
+		technicalDocument,
+	  } = req.files as {
+		[fieldname: string]: Express.MulterS3.File[];
+	  };
+  
+	  if (frontImage) uploadedFiles.push(frontImage[0].key);
+	  if (backImage) uploadedFiles.push(backImage[0].key);
+	  if (insideImage) uploadedFiles.push(insideImage[0].key);
+	  if (othersImage) othersImage.forEach((image) => uploadedFiles.push(image.key));
+	  if (insurancePolicy) uploadedFiles.push(insurancePolicy[0].key);
+	  if (technicalDocument) uploadedFiles.push(technicalDocument[0].key);
+  
+	  let carDetail;
+	  if(req.body.carDetail){
+		  carDetail = JSON.parse(req.body.carDetail);
+		}
+  
+	  const updatedData = {
+		detailsText: req.body.detailsText,
+		carDetail: {
+		  ...carDetail,
+		  frontImage: frontImage ? frontImage[0].location : undefined,
+		  backImage: backImage ? backImage[0].location : undefined,
+		  insideImage: insideImage ? insideImage[0].location : undefined,
+		  othersImage: othersImage ? othersImage.map((image) => image.location) : undefined,
+		  insurancePolicy: insurancePolicy ? insurancePolicy[0].location : undefined,
+		  technicalDocument: technicalDocument ? technicalDocument[0].location : undefined,
+		},
+	  };
+  
+	  const existingAuction = await this.auctionService.getAuctionById(auctionId);
+  
+	  if (frontImage && existingAuction.carDetail?.frontImage) {
+		await deleteOldFiles(existingAuction.carDetail.frontImage);
+	  }
+	  if (backImage && existingAuction.carDetail?.backImage) {
+		await deleteOldFiles(existingAuction.carDetail.backImage);
+	  }
+	  if (insideImage && existingAuction.carDetail?.insideImage) {
+		await deleteOldFiles(existingAuction.carDetail.insideImage);
+	  }
+	  if (othersImage && Array.isArray(existingAuction.carDetail?.othersImage) && existingAuction.carDetail.othersImage.length > 0) {
+		for (const image of existingAuction.carDetail.othersImage) {
+		  await deleteOldFiles(image);
+		}
+	  }
+	  if (insurancePolicy && existingAuction.carDetail?.insurancePolicy) {
+		await deleteOldFiles(existingAuction.carDetail.insurancePolicy);
+	  }
+	  if (technicalDocument && existingAuction.carDetail?.technicalDocument) {
+		await deleteOldFiles(existingAuction.carDetail.technicalDocument);
+	  }
+  
+	  const updatedAuction = await this.auctionService.updateAuctionWithCarDetails(auctionId, updatedData, user);
+  
+	  res.status(200).json(updatedAuction);
+	} catch (error) {
+	  await Promise.all(
+		uploadedFiles.map(async (key) => {
+		  try {
+			await deleteFileFromS3(key);
+			console.log(`File deleted: ${key}`);
+		  } catch (deleteError) {
+			console.error(`Failed to delete file: ${key}`, deleteError);
+		  }
+		})
+	  );
+  
+	  next(error);
 	}
+  }
+  
+
+
+
+//************************************** */
+
+
+
+
+
+
 	
 	async addBidder(req: Request, res: Response, next: NextFunction) {
 		try {

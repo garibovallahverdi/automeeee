@@ -272,7 +272,7 @@ async updateAuctionWithCarDetails(
 			where: {
 			  lotName: filters.lotName ? filters.lotName : undefined,
 			  location: filters.location ? filters.location : undefined,
-			  status: filters.status ? (filters.status as LotStatus) : undefined,
+			  status: LotStatus.active,
 			  carDetail: filters.carDetail
 				? {
 					brand: filters.carDetail.brand ? filters.carDetail.brand : undefined,

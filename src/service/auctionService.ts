@@ -299,6 +299,7 @@ async updateAuctionWithCarDetails(
 			where: { slug },
 			include: {
 			  carDetail: true,
+			  bides:true
 			},
 		  });
 	

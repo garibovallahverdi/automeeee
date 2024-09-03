@@ -202,7 +202,7 @@ async updateAuction(req: Request, res: Response, next: NextFunction) {
 	
 		  res.status(200).json(auction);
 		} catch (error) {
-		  res.status(500).json({ message: error });
+		next(error)
 		}
 	  }
 	

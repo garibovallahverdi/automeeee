@@ -1,30 +1,28 @@
-
-
 model Auction {
-  id             String   @id @default(uuid())
-  slug           String   @unique
-  adminAccept    Boolean      @default(false)
-  lotName        String
-  ownerId        String
-  owner          User     @relation("UserLots", fields: [ownerId], references: [id], onDelete: Cascade)
-  participants   Participant[] @relation("AuctionParticipants") 
-  bides          Bid[]      @relation("AuctionOffers")
-  carDetail      CarDetail? @relation("AuctionCarDetail")
-  carDetailId    String?
-  ownerName      String
-  location       String
-  startPrice     Int 
-  interval       Int?
-  status         LotStatus @default(scheduled)
-  rejectionReason String?
-  detailsText    String
-  lotNumber      Int
-  bidCounts      Int      @default(0)
-  lotViews       Int      @default(0)
-  agreement    Agreement?  
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
+  id                String          @id @default(uuid())
+  slug              String          @unique
+  adminAccept       Boolean         @default(false)
+  lotName           String
+  ownerId           String
+  owner             User            @relation("UserLots", fields: [ownerId], references: [id], onDelete: Cascade)
+  participants      Participant[]   @relation("AuctionParticipants") 
+  bides             Bid[]           @relation("AuctionOffers")
+  carDetail         CarDetail?      @relation("AuctionCarDetail")
+  carDetailId       String?
+  ownerName         String
+  location          String
+  startPrice        Int 
+  interval          Int?
+  status            LotStatus       @default(scheduled)
+  rejectionReason   String?
+  detailsText       String
+  lotNumber         Int
+  bidCounts         Int             @default(0)
+  lotViews          Int             @default(0)
+  agreement         Agreement?  
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  wishlist          Wishlist[]      // Müzayedenin yer aldığı wishlistler
 }
 
 enum LotStatus {
@@ -33,4 +31,3 @@ enum LotStatus {
   completed
   reject
 }
-

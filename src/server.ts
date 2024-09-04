@@ -106,7 +106,7 @@ if (cluster.isPrimary) {
 
   app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(err.stack); 
-    res.status(500).send({message: 'Something went wrong!', error: err.stack});
+    res.status(500).send({message: 'Something went wrong!', error: err.message});
   }); 
   
   const server = http.createServer(app);

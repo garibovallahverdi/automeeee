@@ -1,26 +1,26 @@
 model User {
-  id       String   @id @default(uuid())
-  googleId String?   @unique 
-  firstName    String  
-  lastName     String  
-  email    String   @unique
-  password String
-  location String?
-  role                      Role            @default(USER)
-  auctions Auction[]    @relation("UserLots")
-  participations    Participant[] @relation("ParticipantUsers") // İsimlendirilmiş ilişki
-  bides    Bid[]    @relation("UserOffers") // Kullanıcının teklifleri
-  verificationCode       String?
+  id                      String          @id @default(uuid())
+  googleId                String?         @unique 
+  firstName               String  
+  lastName                String  
+  email                   String          @unique
+  password                String
+  location                String?
+  role                    Role            @default(USER)
+  auctions                Auction[]       @relation("UserLots")
+  participations          Participant[]   @relation("ParticipantUsers")
+  bides                   Bid[]           @relation("UserOffers")
+  verificationCode        String?
   verificationCodeExpiresAt DateTime?
-  resetPassswordCode  String?
-  resetPassCodeExpiresAt DateTime?
-  isEmailVerified            Boolean      @default(false)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  notifications Notification[]
-  buyerAgreements  Agreement[] @relation("BuyerAgreements")
-
-  sellerAgreements Agreement[] @relation("SellerAgreements")
+  resetPassswordCode      String?
+  resetPassCodeExpiresAt  DateTime?
+  isEmailVerified         Boolean         @default(false)
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+  notifications           Notification[]
+  buyerAgreements         Agreement[]     @relation("BuyerAgreements")
+  sellerAgreements        Agreement[]     @relation("SellerAgreements")
+  wishlist                Wishlist[]      // Kullanıcının wishlist'i
 }
 
 enum Role {

@@ -265,7 +265,6 @@ async updateAuctionWithCarDetails(
 
 		return participant;
 	}
-
 	async getAuctions(filters: any) {
 		try {
 		  const auctions = await prisma.auction.findMany({

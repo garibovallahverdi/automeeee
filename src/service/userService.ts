@@ -95,6 +95,50 @@ class UserService {
   }
 
 
+  async toggleWishlist(userId: string, auctionId: string) {
+    const existingWishlistItem = await prisma.wishlist.findUnique({
+        where: {
+            userId_auctionId: {
+                userId,
+                auctionId
+            }
+        }
+    });
+
+    if (existingWishlistItem) {
+       
+        await prisma.wishlist.delete({
+            where: {
+                id: existingWishlistItem.id
+            }
+        });
+        return { message: 'Auction removed from wishlist.' };
+    } else {
+      
+        await prisma.wishlist.create({
+            data: {
+                userId,
+                auctionId
+            }
+        });
+        return { message: 'Auction added to wishlist.' };
+    }
+}
+
+async getUserWishlist(userId: string) {
+   
+   const wishList= await prisma.wishlist.findMany({
+        where: {
+            userId
+        },
+        include: {
+            auction: true 
+        }
+    });
+
+    return wishList
+}
+
  
 }
 

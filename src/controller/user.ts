@@ -64,7 +64,28 @@ class UserController {
     }
   }
   
+  async toggleWishlist(req: Request, res: Response,next:NextFunction) {
+    const { auctionId } = req.body; 
+    const user = req.user as any; 
 
+    try {
+        const result = await  this.userService.toggleWishlist(user.id, auctionId);
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({ error: 'An error occurred while updating wishlist.' });
+    }
+}
+
+async getUserWishlist(req: Request, res: Response,next:NextFunction) {
+    const user = req.user as any; 
+
+    try {
+        const wishlist = await  this.userService.getUserWishlist(user.id);
+        return res.status(200).json(wishlist);
+    } catch (error) {
+        return res.status(500).json({ error: 'An error occurred while retrieving wishlist.' });
+    }
+}
  
 
 }

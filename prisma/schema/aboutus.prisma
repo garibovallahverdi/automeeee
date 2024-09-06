@@ -1,0 +1,22 @@
+model Policy {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  category  PolicyCategory
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+enum PolicyCategory {
+  SELLER_POLICY
+  BUYER_POLICY
+  GENERAL_POLICY
+}
+
+model About {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}

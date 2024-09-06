@@ -11,8 +11,6 @@ import connectRedis from 'connect-redis';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
-import crypto from 'crypto';
-import { ensureAuthenticated } from './middleware/authMiddleware';
 import bodyParser from 'body-parser';
 import http from 'http';  
 import { Server as SocketIOServer } from 'socket.io'; 
@@ -79,23 +77,14 @@ if (cluster.isPrimary) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-
-  app.get('/', ensureAuthenticated,(req, res) => {
-    const user= req.user as any
-    console.log( user.id);
-    
-    res.send(user)
-  });
-
-  app.get('/fast', (req, res) => {
-    res.send("Heloooo");
-  });
-
-  app.get("/slow", (req, res) => {
-    crypto.pbkdf2('secret', 'salt', 5000000, 512, 'sha512', () => {
-      res.send("Slow!");
-    });
-  });
+  // app.get('/fast', (req, res) => {
+  //   res.send("Heloooo");
+  // });
+  // app.get("/slow", (req, res) => {
+  //   crypto.pbkdf2('secret', 'salt', 5000000, 512, 'sha512', () => {
+  //     res.send("Slow!");
+  //   });
+  // });
 
   app.use('/auth', require('./routes/auth').default);
   app.use('/user', require('./routes/user').default);
@@ -103,6 +92,7 @@ if (cluster.isPrimary) {
   app.use('/auction', require('./routes/auction').default);
   app.use('/bid', require('./routes/bid').default);
   app.use('/admin', require('./admin/routes/admin').default);
+  app.use('/admin-settings', require('./admin/routes/aboutandpolicyRouter').default);
 
   app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(err.stack); 

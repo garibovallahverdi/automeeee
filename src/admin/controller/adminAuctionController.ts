@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import prisma from "../../config/db";
-import { NotificationType } from "@prisma/client";
+import { LotStatus, NotificationType } from "@prisma/client";
 import { scheduleAuctionJobs } from "../../utils/queues";
 
 
@@ -14,7 +14,7 @@ export const getAllWaitingAuctions = async (req: Request, res: Response, next: N
       const waitingAuctions = await prisma.auction.findMany({
         where: {
           adminAccept: false,
-          status: 'scheduled'
+          status: LotStatus.scheduled
         },
         include: {
           owner: true,

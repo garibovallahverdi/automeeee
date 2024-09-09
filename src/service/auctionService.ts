@@ -282,6 +282,7 @@ async updateAuctionWithCarDetails(
 			},
 			include: {
 			  carDetail: true, 
+			  wishlist:true
 			},
 		  });
 	
@@ -299,7 +300,8 @@ async updateAuctionWithCarDetails(
 			include: {
 			  carDetail: true,
 			  bides:true,
-			  participants:true
+			  participants:true,
+			  wishlist:true
 
 			},
 		  });

@@ -160,21 +160,26 @@ async updateAuctionWithCarDetails(
 	},
 	user: any
   ) {
-	const { detailsText, location,lotName, carDetail } = data;
-     
-	const existingAuction = await this.getAuctionById(auctionId);
-	const slug = `${lotName?.toLowerCase().replace(/\s+/g, "-")}-${existingAuction.lotNumber}`;
-
+	const { detailsText, location, lotName, carDetail } = data;
   
+	// Mevcut müzayede bilgilerini alın
+	const existingAuction = await this.getAuctionById(auctionId);
+  
+	// lotName varsa slug'ı güncelleyin, yoksa slug ve lotName'i dokunmadan geçin
+	const slug = lotName
+	  ? `${lotName?.toLowerCase().replace(/\s+/g, "-")}-${existingAuction.lotNumber}`
+	  : existingAuction.slug;
+  
+	// Müzayedeyi güncelleyin
 	const updatedAuction = await prisma.auction.update({
 	  where: { id: auctionId },
 	  data: {
 		detailsText,
-		status:"scheduled",
+		status: "scheduled",
 		location,
-		lotName,
-		slug,
-		rejectionReason:'',
+		lotName: lotName || undefined, // lotName varsa güncelle, yoksa dokunma
+		slug: lotName ? slug : undefined, // lotName varsa slug'ı güncelle, yoksa dokunma
+		rejectionReason: '',
 		carDetail: {
 		  update: {
 			brand: carDetail?.brand,
@@ -207,6 +212,7 @@ async updateAuctionWithCarDetails(
   
 	return updatedAuction;
   }
+  
   
   async getAuctionById(auctionId: string) {
 	const auction = await prisma.auction.findUnique({

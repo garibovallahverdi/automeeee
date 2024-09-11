@@ -107,6 +107,8 @@ async updateAuction(req: Request, res: Response, next: NextFunction) {
   
 	  const updatedData = {
 		detailsText: req.body.detailsText,
+		lotName: req.body.lotName,
+		location: req.body.location,
 		carDetail: {
 		  ...carDetail,
 		  frontImage: frontImage ? frontImage[0].location : undefined,

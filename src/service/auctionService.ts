@@ -133,6 +133,8 @@ async updateAuctionWithCarDetails(
 	auctionId: string,
 	data: {
 	  detailsText?: string;
+	  location?: string;
+	  lotName?: string;
 	  carDetail?: {
 		brand?: string;
 		model?: string;
@@ -158,12 +160,21 @@ async updateAuctionWithCarDetails(
 	},
 	user: any
   ) {
-	const { detailsText, carDetail } = data;
+	const { detailsText, location,lotName, carDetail } = data;
+     
+	const existingAuction = await this.getAuctionById(auctionId);
+	const slug = `${lotName?.toLowerCase().replace(/\s+/g, "-")}-${existingAuction.lotNumber}`;
+
   
 	const updatedAuction = await prisma.auction.update({
 	  where: { id: auctionId },
 	  data: {
 		detailsText,
+		status:"scheduled",
+		location,
+		lotName,
+		slug,
+		rejectionReason:'',
 		carDetail: {
 		  update: {
 			brand: carDetail?.brand,

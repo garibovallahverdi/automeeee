@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 router.get('/get-waiting-auctions', ensureAdmin, getAllWaitingAuctions);
-router.get('/get-auction-byid', ensureAdmin, getAuctionByIdAdmin);
+router.get('/get-auction-byid/:id', ensureAdmin, getAuctionByIdAdmin);
 router.post('/update-auction-status/:id', ensureAdmin, updateAuctionStatus);
 
 

@@ -187,8 +187,11 @@ async updateAuction(req: Request, res: Response, next: NextFunction) {
 
 	async getAuctions(req: Request, res: Response,next:NextFunction) {
 		try {
-		  const filters = req.query; // Query parametrelerinden filtreleri alır
-		  const auctions = await this.auctionService.getAuctions(filters);
+		  const filters = req.query; 
+		  const page = parseInt(filters.page as string) || 1; 
+		  const limit = parseInt(filters.limit as string) || 10; 
+		  const skip = (page - 1) * limit;
+		  const auctions = await this.auctionService.getAuctions(filters,skip, limit);
 	
 		  res.status(200).json(auctions);
 		} catch (error) {
@@ -205,6 +208,16 @@ async updateAuction(req: Request, res: Response, next: NextFunction) {
 		  res.status(200).json(auction);
 		} catch (error) {
 		next(error)
+		}
+	  }
+
+
+	  async deleteAuction(req: Request, res: Response,next:NextFunction){
+		try {
+         const {id} =req.params
+		 const deleteAuction = await this.auctionService.deleteAuction(id)
+		}catch(error){
+			next(error)
 		}
 	  }
 	

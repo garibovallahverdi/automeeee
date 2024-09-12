@@ -262,7 +262,7 @@ async updateAuctionWithCarDetails(
 			where: {
 				userId_auctionId: {
 					userId,
-					auctionId,
+					auctionId, 
 				},
 			},
 			include: { auctions: true },
@@ -282,7 +282,7 @@ async updateAuctionWithCarDetails(
 
 		return participant;
 	}
-	async getAuctions(filters: any) {
+	async getAuctions(filters: any,skip: number, limit: number) {
 		try {
 		  const auctions = await prisma.auction.findMany({
 			where: {
@@ -301,6 +301,8 @@ async updateAuctionWithCarDetails(
 			  carDetail: true, 
 			  wishlist:true
 			},
+			 skip: skip, 
+     		 take: limit, 
 		  });
 	
 		  return auctions;
@@ -333,7 +335,20 @@ async updateAuctionWithCarDetails(
 		}
 	  }
 
-	  
+	  async deleteAuction(id:string){
+		try {
+			const  auction = await prisma.auction.delete({
+				where: { id },
+			})
+
+			console.log(auction);
+			
+
+		} catch (error) {
+			throw new Error("Have something problem while delete auction")
+		}
+
+	  }
 
 	
 }

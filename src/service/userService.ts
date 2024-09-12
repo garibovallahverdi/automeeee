@@ -126,17 +126,21 @@ class UserService {
 }
 
 async getUserWishlist(userId: string) {
-   
-   const wishList= await prisma.wishlist.findMany({
-        where: {
-            userId
-        },
+  const wishList = await prisma.wishlist.findMany({
+    where: {
+      userId,
+    },
+    include: {
+      auction: {
         include: {
-            auction: true 
-        }
-    });
+          owner: true, 
+          carDetail: true,
+        },
+      },
+    },
+  });
 
-    return wishList
+  return wishList;
 }
 
  

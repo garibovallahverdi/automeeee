@@ -146,7 +146,7 @@ export const scheduleBidJob = async (auction: any,bid:any,userId:string) => {
   }
 
   await auctionQueue.add('completeAuctionAfterBid', { auction,bid,userId }, {
-    delay: 2 * 60 * 1000,
+    delay: 7*24*60 * 60 * 1000,
     jobId: `completeAuctionAfterBid-${auction.id}`,
   });
   console.log(`New job scheduled to complete auction ${auction.id} 24 hours after the last bid.`);

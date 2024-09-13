@@ -37,7 +37,7 @@ auctionQueue.process('startAuction', async (job) => {
   }
 });
 auctionQueue.process('completeAuctionNoBids', async (job) => {
-  const { auctionId } = job.data;
+  const { auctionId,userId } = job.data;
 
   try {
     // Auction statusunu 'completed' yap
@@ -45,7 +45,18 @@ auctionQueue.process('completeAuctionNoBids', async (job) => {
       where: { id: auctionId },
       data: { status: 'completed' },
     });
-
+    const auction= await prisma.auction.findUnique({
+      where:{id:auctionId}
+    })
+    const notificationBuyer = await prisma.notification.create({
+      data:{
+        userId:userId, 
+        auctionId:auctionId,
+        type:NotificationType.AUCTION_ENDED,
+        message:`Your auction #${auction?.lotNumber} ${auction?.lotName} is ended`
+        
+      }
+    })
     console.log(`Auction ${auctionId} completed due to no bids.`);
 
     // Auction sahibine bildirim gönder
@@ -78,8 +89,8 @@ auctionQueue.process('completeAuctionAfterBid', async (job) => {
     const notificationBuyer = await prisma.notification.create({
       data:{
         userId, 
-        auctionId:auction.id,
-        type:NotificationType.YOU_ARE_WINNER,
+        agreementId:agrement.id,
+        type:NotificationType.AGREEMENT,
         message:`You are winner the lot #${auction.lotNumber} ${auction.lotName}`
         
       }
@@ -87,8 +98,8 @@ auctionQueue.process('completeAuctionAfterBid', async (job) => {
     const notificationSeller = await prisma.notification.create({
       data:{
         userId:auction.ownerId, 
-        auctionId:auction.id,
-        type:NotificationType.AUCTION_ENDED,
+        agreementId:agrement.id,
+        type:NotificationType.AGREEMENT,
         message:`The auction for your ${auction.lotName} with lot number #${auction.lotNumber} has ended. `
         
       }
@@ -122,7 +133,7 @@ export const scheduleAuctionJobs = async (auction: any) => {
   const auctionEndDelay = new Date(auction.updatedAt).getTime() + 7 * 24 * 60 * 60 * 1000 - Date.now();
   // const auctionEndDelay = new Date(auction.updatedAt).getTime() + 5 * 60 * 1000 - Date.now();
 
-  await auctionQueue.add('completeAuctionNoBids', { auctionId: auction.id }, {
+  await auctionQueue.add('completeAuctionNoBids', { auctionId: auction.id,userId:auction.ownerId }, {
     delay: auctionEndDelay, 
     jobId: `completeAuctionNoBids-${auction.id}`,
   });

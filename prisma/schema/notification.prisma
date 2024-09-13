@@ -1,12 +1,12 @@
 model Notification {
   id            String       @id @default(uuid())
   userId        String
-  auctionId     String
+  auctionId     String?
+  agreementId   String?
   type          NotificationType
   message       String
   createdAt     DateTime  @default(now())
   read          Boolean   @default(false)
-
   user          User      @relation(fields: [userId], references: [id])
 }
 
@@ -14,5 +14,5 @@ enum NotificationType {
   AUCTION_ACCEPTED
   AUCTION_REJECTED
   AUCTION_ENDED
-  YOU_ARE_WINNER
+  AGREEMENT
 }

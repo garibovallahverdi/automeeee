@@ -1,6 +1,7 @@
 import { LotStatus } from "@prisma/client";
 import prisma from "../config/db";
 import { DateTime } from 'luxon';
+import { scheduleAuctionJobs } from "../utils/queues";
 // import {  scheduleAuctionJobs } from "../utils/queues";
 
 type CarDetailFilter = {
@@ -123,7 +124,6 @@ class AuctionService {
 			carDetail: true, 
 		  },
 		});
-	  
 		return createdAuction;
 	  }
 	  
@@ -335,10 +335,10 @@ async updateAuctionWithCarDetails(
 		}
 	  }
 
-	  async deleteAuction(id:string){
+	  async deleteAuction(auctionId:string){
 		try {
 			const  auction = await prisma.auction.delete({
-				where: { id },
+				where: {id: auctionId },
 			})
 
 			console.log(auction);

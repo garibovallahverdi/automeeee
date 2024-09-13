@@ -24,7 +24,6 @@ class AuctionController {
 			if (othersImage) othersImage.forEach(image => uploadedFiles.push(image.key));
 			if (insurancePolicy) uploadedFiles.push(insurancePolicy[0].key);
 			if (technicalDocument) uploadedFiles.push(technicalDocument[0].key);
-	     console.log(frontImage);
 		 
 		  let carDetail;
 		  carDetail = JSON.parse(req.body.carDetail);
@@ -52,7 +51,6 @@ class AuctionController {
 	  
 		  const auction = await this.auctionService.createAuctionWithCarDetails(data, user);
 	  
-		  console.log(req.files);
 	  
 		  res.status(201).json(auction);
 		} catch (error) {
@@ -214,8 +212,8 @@ async updateAuction(req: Request, res: Response, next: NextFunction) {
 
 	  async deleteAuction(req: Request, res: Response,next:NextFunction){
 		try {
-         const {id} =req.params
-		 const deleteAuction = await this.auctionService.deleteAuction(id)
+         const {auctionId} =req.params
+		 const deleteAuction = await this.auctionService.deleteAuction(auctionId)
 		}catch(error){
 			next(error)
 		}

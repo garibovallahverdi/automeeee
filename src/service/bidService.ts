@@ -27,7 +27,13 @@ export class BidService {
     if (participant.bidCount <= 0) {
       throw new Error('Your bid count is exhausted. Please make a payment to place more bids.');
     }
-  
+
+    const auction  = await prisma.auction.findUnique({
+      where: { id: auctionId },
+    })
+     if(auction && bidAmount < auction?.startPrice) {
+          throw new Error("The bid offer should be higher then auction start price")
+     }
     const highestBid = await prisma.bid.findFirst({
       where: { auctionId },
       orderBy: { amount: 'desc' },
@@ -69,9 +75,7 @@ export class BidService {
       data: { bidCounts: { increment: 1 } },
     });
 
-    const auction  = await prisma.auction.findUnique({
-      where: { id: auctionId },
-    })
+   
     await scheduleBidJob(auction, bid,userId);
 
     return bid;

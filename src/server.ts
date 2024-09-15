@@ -119,9 +119,9 @@ if (cluster.isPrimary) {
 
     socket.on('new_bid', (data) => {
       const room = `auction-${data.auctionId}`;
-        
+
       io.to(room).emit('bid_update', data);
-    });
+    }); 
 
     socket.on('disconnect', () => {
       console.log('User disconnected:', socket.id);

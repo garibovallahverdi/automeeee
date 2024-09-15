@@ -14,6 +14,5 @@ router.get('/get-auctions', (req, res, next) => auctionController.getAuctions(re
 router.get('/get-auction/:slug', (req, res, next) => auctionController.getAuctionBySlug(req, res, next));
 
 
-// router.post('/delete-auction/:id', (req, res, next) => auctionController.deleteAuction(req, res,next));
 
 export default router;

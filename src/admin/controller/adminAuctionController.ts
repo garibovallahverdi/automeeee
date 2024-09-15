@@ -95,7 +95,7 @@ export const getAuctionByIdAdmin = async  (req: Request, res: Response, next: Ne
                     adminAccept: true,
                     status: 'active',
                     rejectionReason: null,
-                    updatedAt:new Date()
+                    startTime:new Date()
                 },
                 include:{carDetail:true}
             });
@@ -111,7 +111,6 @@ export const getAuctionByIdAdmin = async  (req: Request, res: Response, next: Ne
                     adminAccept: false,
                     status: 'reject',
                     rejectionReason: rejectionReason || 'No reason provided',
-                    startTime:new Date()
                 },
                 include:{carDetail:true}
 

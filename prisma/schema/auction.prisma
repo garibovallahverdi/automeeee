@@ -9,7 +9,7 @@ model Auction {
   bides             Bid[]           @relation("AuctionOffers")
   carDetail         CarDetail?      @relation("AuctionCarDetail")
   carDetailId       String?
-  startTime         String?
+  startTime         DateTime?
   ownerName         String
   location          String
   startPrice        Int 

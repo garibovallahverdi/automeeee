@@ -75,8 +75,9 @@ export class BidService {
       data: { bidCounts: { increment: 1 } },
     });
 
-   
+    
     await scheduleBidJob(auction, bid,userId);
+    console.log("Teklif edildi");
 
     return bid;
   }

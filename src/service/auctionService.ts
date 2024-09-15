@@ -335,13 +335,14 @@ async updateAuctionWithCarDetails(
 		}
 	  }
 
-	  async deleteAuction(auctionId:string){
+	  async deleteAuction(auctionId:string,user:any){
 		try {
-			const  auction = await prisma.auction.delete({
-				where: {id: auctionId },
-			})
 
-			console.log(auction);
+
+			const  auction = await prisma.auction.delete({
+				where: {id: auctionId,status:'reject',ownerId:user.id },
+			})
+            return auction;
 			
 
 		} catch (error) {

@@ -107,7 +107,7 @@ if (cluster.isPrimary) {
       credentials: true 
     }
   });
-
+ 
   io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
@@ -119,6 +119,7 @@ if (cluster.isPrimary) {
 
     socket.on('new_bid', (data) => {
       const room = `auction-${data.auctionId}`;
+        
       io.to(room).emit('bid_update', data);
     });
 

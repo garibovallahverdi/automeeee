@@ -212,8 +212,9 @@ async updateAuction(req: Request, res: Response, next: NextFunction) {
 
 	  async deleteAuction(req: Request, res: Response,next:NextFunction){
 		try {
+			const user = req.user as any
          const {auctionId} =req.params
-		 const deleteAuction = await this.auctionService.deleteAuction(auctionId)
+		 const deleteAuction = await this.auctionService.deleteAuction(auctionId, user)
 		}catch(error){
 			next(error)
 		}

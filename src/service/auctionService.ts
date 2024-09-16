@@ -321,7 +321,10 @@ async updateAuctionWithCarDetails(
 			  bides:{
 				include:{
 					user:true
-				}
+				},
+				orderBy: {
+					amount: 'desc',  
+				  },
 			  },
 			  participants:true,
 			  wishlist:true

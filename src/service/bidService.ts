@@ -56,6 +56,9 @@ export class BidService {
         userId,
         auctionId,
       },
+      include:{
+        user:true
+      }
     });
   
     await prisma.participant.update({
@@ -72,7 +75,7 @@ export class BidService {
   
     await prisma.auction.update({
       where: { id: auctionId },
-      data: { bidCounts: { increment: 1 } },
+      data: { bidCounts: { increment: 1 }, stratTimeAfterBid:new Date() },
     });
 
     

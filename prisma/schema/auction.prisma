@@ -10,6 +10,7 @@ model Auction {
   carDetail         CarDetail?      @relation("AuctionCarDetail")
   carDetailId       String?
   startTime         DateTime?
+  stratTimeAfterBid DateTime?
   ownerName         String
   location          String
   startPrice        Int 
